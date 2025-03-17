@@ -1,10 +1,10 @@
 import DoctorProfile from "@/components/DoctorProfile";
 import DatePickerComponent from "@/components/ui/DatePickerComponent";
 import AdditionalInformation from "@/components/AdditionalInformation";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 
 export default function Home() {
-  redirect("/doctor-dashboard");
+  // redirect("/doctor-dashboard");
   return (
     <div className="flex justify-center items-start min-h-screen p-10 bg-white">
       <div className="w-full max-w-6xl bg-white p-6 rounded-lg ">
