@@ -1,6 +1,13 @@
 "use client";
 import { useState } from "react";
-import { Bell } from "lucide-react";
+import {
+  Bell,
+  Clipboard,
+  Share2,
+  DollarSign,
+  TrendingUp,
+  UserPlus,
+} from "lucide-react";
 import Sidebar from "@/components/SidebarLayout";
 import UpcomingAppointments from "@/components/UpcomingAppointments";
 
@@ -26,15 +33,15 @@ export default function DoctorDashboard() {
   ];
 
   // Mock Earnings & Referrals
-  const earnings = {
-    total: 5000,
-    pending: 1200,
-  };
+  // const earnings = {
+  //   total: 5000,
+  //   pending: 1200,
+  // };
 
-  const referrals = {
-    signUps: 3,
-    commissionEarned: 300,
-  };
+  // const referrals = {
+  //   signUps: 3,
+  //   commissionEarned: 300,
+  // };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -97,7 +104,10 @@ export default function DoctorDashboard() {
         <div className="mt-8 grid grid-cols-2 gap-6">
           {/* Earnings Overview */}
           <div className="bg-white p-6 shadow-lg rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Earnings Overview</h2>
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <DollarSign className="mr-2 text-green-500" size={24} />
+              Earnings Overview
+            </h2>
 
             {/* Total Earnings */}
             <div className="flex justify-between items-center mb-2">
@@ -106,8 +116,9 @@ export default function DoctorDashboard() {
             </div>
 
             {/* Percentage Growth */}
-            <p className="text-sm text-gray-500 mb-4">
-              📈 +15% from last month
+            <p className="text-sm text-gray-500 mb-4 flex items-center">
+              <TrendingUp size={18} className="mr-1 text-green-500" />
+              +15% from last month
             </p>
 
             {/* Breakdown */}
@@ -134,7 +145,10 @@ export default function DoctorDashboard() {
 
           {/* Referral Stats */}
           <div className="bg-white p-6 shadow-lg rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Referral Stats</h2>
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <TrendingUp className="mr-2 text-blue-500" size={24} />
+              Referral Stats
+            </h2>
 
             {/* Total Referrals */}
             <div className="flex justify-between items-center mb-2">
@@ -143,8 +157,9 @@ export default function DoctorDashboard() {
             </div>
 
             {/* This Month's Referrals */}
-            <p className="text-sm text-gray-500 mb-4">
-              📈 3 new referrals this month (+2 from last month)
+            <p className="text-sm text-gray-500 mb-4 flex items-center">
+              <UserPlus size={18} className="mr-1 text-blue-500" />3 new
+              referrals this month (+2 from last month)
             </p>
 
             {/* Commission Earnings */}
@@ -165,11 +180,12 @@ export default function DoctorDashboard() {
 
             {/* Share Referral Link */}
             <div className="flex items-center gap-4">
-              <button className="bg-gray-200 text-black px-4 py-2 rounded-full hover:bg-gray-300">
+              <button className="bg-gray-200 text-black px-4 py-2 rounded-full hover:bg-gray-300 flex items-center">
+                <Clipboard className="mr-2" size={20} />
                 Copy Referral Link
               </button>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
-                Share on Social Media
+              <button className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 flex items-center">
+                <Share2 className="mr-2" size={20} /> Share on Social Media
               </button>
             </div>
           </div>

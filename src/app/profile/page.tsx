@@ -1,14 +1,17 @@
 import Sidebar from "@/components/SidebarLayout";
+import ProfileSettings from "./ProfileSettings";
 
 export default function ProfilePage() {
   return (
     <div className="flex">
-      {/* Sidebar on the left */}
-      <Sidebar />
+      {/* Sidebar */}
+      <div className="w-1/6">
+        <Sidebar />
+      </div>
 
-      {/* Empty space for future content */}
-      <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold">Profile Page</h1>
+      {/* Profile Settings (Tabs UI) */}
+      <div className="w-5/6 p-4">
+        <ProfileSettings />
       </div>
     </div>
   );

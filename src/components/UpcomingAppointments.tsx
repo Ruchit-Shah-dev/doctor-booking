@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { CalendarClock } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -67,7 +68,10 @@ export default function UpcomingAppointments() {
 
   return (
     <div className="bg-white p-6 shadow-lg rounded-lg w-full">
-      <h2 className="text-lg font-semibold mb-4">Upcoming Appointments</h2>
+      <h2 className="text-lg font-semibold mb-4 flex items-center">
+        <CalendarClock size={20} className="mr-2 text-purple-600" />
+        Upcoming Appointments
+      </h2>
       <Table>
         <TableHeader>
           <TableRow>
