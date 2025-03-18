@@ -15,6 +15,7 @@ const ProfileSettings = () => {
     // ✅ Basic Info
     name: "",
     photo: null, // File object (image upload)
+    previewUrl: "",
     contact: "",
     email: "",
     country: "",
@@ -29,8 +30,9 @@ const ProfileSettings = () => {
 
     // ✅ Specialization & Experience
     yearsOfPractice: 0,
+    clinicHospital: "",
     certifications: [],
-    expertise: "",
+    expertise: [],
 
     // ✅ Pricing & Availability
     consultationFee: 0,
@@ -74,7 +76,7 @@ const ProfileSettings = () => {
           {activeTab === "Basic Info" && (
             <BasicInfo formData={formData} setFormData={setFormData} />
           )}
-          {activeTab === "Specialization" && (
+          {activeTab === "Experience" && (
             <SpecializationExperience
               formData={formData}
               setFormData={setFormData}

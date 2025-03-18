@@ -2,6 +2,7 @@ export interface FormDataType {
   // ✅ Basic Info
   name: string;
   photo: File | null;
+  previewUrl: string | null;
   contact: string;
   email: string;
   country: string;
@@ -16,8 +17,9 @@ export interface FormDataType {
 
   // ✅ Specialization & Experience
   yearsOfPractice: number;
-  certifications: string[]; // Array of certification names
-  expertise: string;
+  clinicHospital: string;
+  certifications: { name: string; url: string }[]; // Stores file name + preview URL
+  expertise: string[];
 
   // ✅ Pricing & Availability
   consultationFee: number;

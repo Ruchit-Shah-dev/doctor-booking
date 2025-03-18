@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { FormDataType } from "@/types/types";
 import Image from "next/image";
 
@@ -8,7 +8,7 @@ interface BasicInfoProps {
 }
 
 const BasicInfo: React.FC<BasicInfoProps> = ({ formData, setFormData }) => {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  //   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // 🔹 Handle input changes dynamically
   const handleChange = (
@@ -35,11 +35,11 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ formData, setFormData }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setFormData({ ...formData, photo: file });
 
       // Generate a preview URL
       const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
+      console.log(objectUrl);
+      setFormData({ ...formData, photo: file, previewUrl: objectUrl });
     }
   };
 
@@ -72,9 +72,9 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ formData, setFormData }) => {
               onChange={handleFileChange}
               className="mt-1"
             />
-            {previewUrl && (
+            {formData.previewUrl && (
               <Image
-                src={previewUrl}
+                src={formData.previewUrl}
                 alt="Profile Preview"
                 width={64}
                 height={64}
