@@ -1,26 +1,22 @@
-import { GraduationCap, Clock, Languages, Building, Star } from "lucide-react";
+import { Clock, Languages, Building, Stethoscope } from "lucide-react";
 
 const additionalInfo = [
   { icon: <Clock size={18} />, label: "Experience", value: "10+ years" },
-  {
-    icon: <GraduationCap size={18} />,
-    label: "Education",
-    value: "MPT (Master of Physiotherapy)",
-  },
+
   {
     icon: <Languages size={18} />,
     label: "Languages Spoken",
     value: "English, Hindi",
   },
   {
+    icon: <Stethoscope size={18} />,
+    label: "Expertise",
+    value: "Sports Injury, Joint Pain, Posture Correction",
+  },
+  {
     icon: <Building size={18} />,
     label: "Clinic/Hospital",
     value: "MAMAFLEX Center, Mumbai",
-  },
-  {
-    icon: <Star size={18} />,
-    label: "Ratings",
-    value: "⭐ 4.9/5 (120 reviews)",
   },
 ];
 

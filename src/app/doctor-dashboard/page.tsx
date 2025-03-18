@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Bell } from "lucide-react";
 import Sidebar from "@/components/SidebarLayout";
+import UpcomingAppointments from "@/components/UpcomingAppointments";
 
 export default function DoctorDashboard() {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -23,6 +24,17 @@ export default function DoctorDashboard() {
       time: "1 day ago",
     },
   ];
+
+  // Mock Earnings & Referrals
+  const earnings = {
+    total: 5000,
+    pending: 1200,
+  };
+
+  const referrals = {
+    signUps: 3,
+    commissionEarned: 300,
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -76,19 +88,90 @@ export default function DoctorDashboard() {
           </h2>
         </div>
 
-        {/* Other Dashboard Sections */}
+        {/* Upcoming Appointments (Separate Component) */}
+        <div className="mt-8">
+          <UpcomingAppointments />
+        </div>
+
+        {/* Earnings Overview & Referral Stats */}
         <div className="mt-8 grid grid-cols-2 gap-6">
-          {/* Next Appointments Table */}
+          {/* Earnings Overview */}
           <div className="bg-white p-6 shadow-lg rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Next Appointments</h2>
-            <p>📅 Dr. Smith with Patient XYZ (10:30 AM)</p>
+            <h2 className="text-lg font-semibold mb-4">Earnings Overview</h2>
+
+            {/* Total Earnings */}
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-gray-600">Total Earnings (March):</p>
+              <p className="text-xl font-bold text-green-600">$5,000</p>
+            </div>
+
+            {/* Percentage Growth */}
+            <p className="text-sm text-gray-500 mb-4">
+              📈 +15% from last month
+            </p>
+
+            {/* Breakdown */}
+            <div className="mb-4">
+              <p>
+                🔹 Appointments: <span className="font-medium">$4,200</span>
+              </p>
+              <p>
+                🔹 Referrals: <span className="font-medium">$800</span>
+              </p>
+            </div>
+
+            {/* Pending Withdrawals */}
+            <div className="mb-4 flex justify-between items-center">
+              <p className="text-gray-600">Pending Withdrawals:</p>
+              <p className="text-lg font-bold text-red-500">$1,200</p>
+            </div>
+
+            {/* Withdraw Button */}
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
+              Withdraw Now
+            </button>
           </div>
 
-          {/* Earnings Overview & Referral Stats */}
+          {/* Referral Stats */}
           <div className="bg-white p-6 shadow-lg rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Earnings & Referrals</h2>
-            <p>💰 This Month: $5000</p>
-            <p>🔗 Referrals: 3 ($300 earned)</p>
+            <h2 className="text-lg font-semibold mb-4">Referral Stats</h2>
+
+            {/* Total Referrals */}
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-gray-600">Total Referrals:</p>
+              <p className="text-xl font-bold text-blue-600">10</p>
+            </div>
+
+            {/* This Month's Referrals */}
+            <p className="text-sm text-gray-500 mb-4">
+              📈 3 new referrals this month (+2 from last month)
+            </p>
+
+            {/* Commission Earnings */}
+            <div className="mb-4 flex justify-between items-center">
+              <p className="text-gray-600">Total Earnings from Referrals:</p>
+              <p className="text-lg font-bold text-green-600">$300</p>
+            </div>
+
+            {/* Referral Activity */}
+            <div className="mb-4">
+              <h3 className="text-md font-semibold mb-2">Recent Referrals:</h3>
+              <ul className="text-gray-600">
+                <li>🔹 John Doe - March 12 ($50 earned)</li>
+                <li>🔹 Jane Smith - March 8 ($100 earned)</li>
+                <li>🔹 Michael Johnson - March 5 ($150 earned)</li>
+              </ul>
+            </div>
+
+            {/* Share Referral Link */}
+            <div className="flex items-center gap-4">
+              <button className="bg-gray-200 text-black px-4 py-2 rounded-full hover:bg-gray-300">
+                Copy Referral Link
+              </button>
+              <button className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
+                Share on Social Media
+              </button>
+            </div>
           </div>
         </div>
       </div>
