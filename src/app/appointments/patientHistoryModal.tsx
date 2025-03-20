@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,6 +10,14 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer";
 import {
   Table,
   TableBody,
@@ -19,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { format, isToday, isTomorrow } from "date-fns";
 
 type Appointment = {
   id: number;
@@ -97,6 +107,7 @@ export default function PatientHistoryModal({
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [showRecordsModal, setShowRecordsModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("upcoming");
 
   if (!patient) return null;
 
@@ -114,144 +125,236 @@ export default function PatientHistoryModal({
     }
   };
 
+  //   const formatDateTime = (dateTime) => {
+  //     const now = new Date();
+  //     const date = new Date(dateTime);
+
+  //     const isToday = format(date, "yyyy-MM-dd") === format(now, "yyyy-MM-dd");
+  //     const isTomorrow =
+  //       format(date, "yyyy-MM-dd") ===
+  //       format(new Date(now.setDate(now.getDate() + 1)), "yyyy-MM-dd");
+
+  //     // Get start and end time (30 minutes duration)
+  //     const startTime = format(date, "HH:mm");
+  //     const endTime = format(new Date(date.getTime() + 30 * 60000), "HH:mm");
+
+  //     if (isToday) {
+  //       return `Today ${startTime} - ${endTime}`;
+  //     } else if (isTomorrow) {
+  //       return `Tomorrow ${startTime} - ${endTime}`;
+  //     } else {
+  //       return `${format(date, "dd/MM")} ${startTime} - ${endTime}`;
+  //     }
+  //   };
+
+  // Reusable Table Component (ShadCN Table)
+  const TableComponent = ({ title, data }) => (
+    <div>
+      <h4 className="text-lg font-semibold text-gray-800 mb-2">{title}</h4>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date & Time</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Session</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.length > 0 ? (
+            data.map((appt) => {
+              const appointmentDate = new Date(appt.dateTime);
+              const startTime = format(appointmentDate, "H:mm");
+              const endTime = format(
+                new Date(appointmentDate.getTime() + 30 * 60000),
+                "H:mm"
+              );
+
+              let displayDate;
+              if (isToday(appointmentDate)) {
+                displayDate = `Today ${startTime} - ${endTime}`;
+              } else if (isTomorrow(appointmentDate)) {
+                displayDate = `Tomorrow ${startTime} - ${endTime}`;
+              } else {
+                displayDate = `${format(
+                  appointmentDate,
+                  "d MMM"
+                )} ${startTime} - ${endTime}`;
+              }
+
+              return (
+                <TableRow key={appt.id}>
+                  <TableCell>{displayDate}</TableCell>
+                  <TableCell>{appt.type}</TableCell>
+                  <TableCell>{appt.sessionType}</TableCell>
+                </TableRow>
+              );
+            })
+          ) : (
+            <TableRow>
+              <TableCell colSpan="3" className="text-center text-gray-500">
+                No appointments available
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl p-6">
-        <DialogHeader>
-          <DialogTitle>Patient History</DialogTitle>
-        </DialogHeader>
+    <>
+      {/* Tailwind Drawer */}
+      {isOpen && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ease-in-out"
+            onClick={onClose}
+          ></div>
 
-        {/* Profile Card */}
-        <div className="border-b pb-4">
-          <h3 className="text-lg font-semibold">{patient.name}</h3>
-          <p className="text-sm text-gray-600">Age: {patient.age}</p>
-          <p className="text-sm text-gray-600">User ID: {patient.userID}</p>
-        </div>
-
-        {/* Buttons Section */}
-        <div className="flex gap-2 my-4">
-          <Button variant="outline" onClick={() => setShowAlertModal(true)}>
-            Alert Patient
-          </Button>
-          <Button variant="outline" disabled>
-            Custom Reminder
-          </Button>
-        </div>
-
-        {/* Stage Label */}
-        <p className="text-sm font-semibold">
-          Stage: <span className="text-gray-700">{patient.stage}</span>
-        </p>
-
-        {/* Upcoming Appointments Table */}
-        <div className="mt-4">
-          <h4 className="font-semibold">Upcoming Appointments</h4>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Session</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {upcomingAppointments.map((appt) => (
-                <TableRow key={appt.id}>
-                  <TableCell>{appt.type}</TableCell>
-                  <TableCell>{appt.sessionType}</TableCell>
-                  <TableCell>
-                    {new Date(appt.dateTime).toLocaleString()}
-                  </TableCell>
-                  {/* <TableCell>{appt.status}</TableCell> */}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Past Appointments Table */}
-        <div className="mt-4">
-          <h4 className="font-semibold">Past Appointments</h4>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Session</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pastAppointments.map((appt) => (
-                <TableRow key={appt.id}>
-                  <TableCell>{appt.type}</TableCell>
-                  <TableCell>{appt.sessionType}</TableCell>
-                  <TableCell>
-                    {new Date(appt.dateTime).toLocaleString()}
-                  </TableCell>
-                  {/* <TableCell>{appt.status}</TableCell> */}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Notes Button */}
-        <div className="mt-4">
-          <Button variant="outline" onClick={() => setShowNotesModal(true)}>
-            View Notes
-          </Button>
-        </div>
-
-        {/* Patient Records Button */}
-        <div className="mt-2">
-          <Button variant="outline" onClick={() => setShowRecordsModal(true)}>
-            Patient Records
-          </Button>
-        </div>
-
-        <DialogFooter>
-          <Button onClick={onClose}>Close</Button>
-        </DialogFooter>
-      </DialogContent>
-      {/* Alert Patient Modal */}
-      <Dialog open={showAlertModal} onOpenChange={setShowAlertModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Alert Patient</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="alert"
-                onChange={() => setAlertOption("Urgent Attention Required")}
-              />
-              <span>Urgent Attention Required</span>
-            </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="alert"
-                onChange={() => setAlertOption("Schedule Follow-up")}
-              />
-              <span>Schedule Follow-up</span>
-            </label>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAlertModal(false)}>
-              Cancel
-            </Button>
-            <Button
-              disabled={!alertOption}
-              onClick={() => setShowAlertModal(false)}
+          {/* Drawer Content with Smooth Slide-in Animation */}
+          <div
+            className={`fixed top-6 left-6 bottom-6 h-[calc(100%-3rem)] w-[45%] 
+                bg-white shadow-2xl z-50 rounded-lg border transform 
+                transition-transform duration-500 ease-in-out translate-x-0 
+                p-6 overflow-y-auto`}
+          >
+            {/* Close Button with Improved UI */}
+            <button
+              className="absolute right-4 top-4 text-gray-500 hover:text-gray-800 
+               bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center 
+               justify-center transition-colors"
+              onClick={onClose}
             >
-              Send
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              ✕
+            </button>
+
+            {/* Drawer Header */}
+            <h2 className="text-xl font-bold text-gray-800 mb-6">
+              Patient History
+            </h2>
+
+            <div className="bg-white shadow-md rounded-lg p-4 flex items-center gap-4 border mb-4">
+              {/* Profile Image */}
+              <div className="w-24 h-24 md:w-32 md:h-32">
+                <Image
+                  src="/doctor-avatar.webp"
+                  alt={patient.name}
+                  width={128}
+                  height={128}
+                  className="rounded-full object-cover w-full h-full"
+                />
+              </div>
+
+              {/* Patient Info */}
+              <div className="flex flex-col gap-1 text-gray-800">
+                <h3 className="text-xl font-bold">{patient.name}</h3>
+
+                <div className="text-sm text-gray-600 flex items-center gap-2">
+                  <span className="font-medium">Age:</span> {patient.age}
+                </div>
+
+                <div className="text-sm text-gray-600 flex items-center gap-2">
+                  <span className="font-medium">User ID:</span> {patient.userID}
+                </div>
+
+                <div className="text-sm text-gray-600 flex items-center gap-2">
+                  <span className="font-medium">Stage:</span>
+                  {patient.stage}
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    className="rounded-full px-4 py-2"
+                    variant="outline"
+                    onClick={() => setShowAlertModal(true)}
+                  >
+                    Alert Patient
+                  </Button>
+                  <Button
+                    className="rounded-full px-4 py-2"
+                    variant="outline"
+                    disabled
+                  >
+                    Custom Reminder
+                  </Button>
+                  <Button
+                    className="rounded-full px-4 py-2"
+                    variant="outline"
+                    disabled
+                  >
+                    Companion Activity
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              {/* Section Title */}
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Appointments
+              </h3>
+
+              {/* Tabs */}
+              <div className="flex font-medium mb-4">
+                <button
+                  className={`px-4 py-2 text-md font-medium focus:outline-none ${
+                    activeTab === "upcoming"
+                      ? "border-b-2 border-blue-500 text-blue-600"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("upcoming")}
+                >
+                  Upcoming
+                </button>
+                <button
+                  className={`px-4 py-2 text-md font-medium focus:outline-none ${
+                    activeTab === "past"
+                      ? "border-b-2 border-blue-500 text-blue-600"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("past")}
+                >
+                  Past
+                </button>
+              </div>
+
+              {/* Appointment Table (Switches Based on Active Tab) */}
+              <div className="bg-white rounded-lg p-4">
+                {activeTab === "upcoming" ? (
+                  <TableComponent
+                    title="Upcoming Appointments"
+                    data={upcomingAppointments}
+                  />
+                ) : (
+                  <TableComponent
+                    title="Past Appointments"
+                    data={pastAppointments}
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-center gap-4">
+              <Button
+                variant="outline"
+                className="rounded-full px-6 py-2"
+                onClick={() => setShowNotesModal(true)}
+              >
+                View Notes
+              </Button>
+              <Button
+                variant="outline"
+                className="rounded-full px-6 py-2"
+                onClick={() => setShowRecordsModal(true)}
+              >
+                Patient Records
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Notes Modal */}
       <Dialog open={showNotesModal} onOpenChange={setShowNotesModal}>
@@ -296,6 +399,52 @@ export default function PatientHistoryModal({
           </Tabs>
         </DialogContent>
       </Dialog>
-    </Dialog>
+
+      {/* Alert Patient Modal */}
+      <Dialog open={showAlertModal} onOpenChange={setShowAlertModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alert Patient</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="alert"
+                onChange={() => setAlertOption("Follow Up / Overdue")}
+              />
+              <span>Urgent Attention Required</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="alert"
+                onChange={() => setAlertOption("Medication Adherence Warnings")}
+              />
+              <span>Schedule Follow-up</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="alert"
+                onChange={() => setAlertOption("Critical Lab Results")}
+              />
+              <span>Schedule Follow-up</span>
+            </label>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAlertModal(false)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!alertOption}
+              onClick={() => setShowAlertModal(false)}
+            >
+              Send
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

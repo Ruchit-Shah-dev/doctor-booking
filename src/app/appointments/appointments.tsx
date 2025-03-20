@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import {
   Table,
   TableBody,
@@ -25,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
+import { format, isToday, isTomorrow } from "date-fns";
 
 type Appointment = {
   id: number;
@@ -107,6 +109,7 @@ export default function Appointments() {
 
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("upcoming");
 
   // Filter data based on selected patient
   const filteredUpcoming = upcomingAppointments.filter(
@@ -157,101 +160,162 @@ export default function Appointments() {
           className="mb-4 w-full"
         />
 
-        {/* Upcoming Appointments Table */}
-        <h3 className="text-lg font-semibold mb-2">Upcoming Appointments</h3>
-        <Table className="mb-6">
-          <TableHeader>
-            <TableRow className="bg-gray-100">
-              <TableHead>Patient Name</TableHead>
-              <TableHead>Appointment Type</TableHead>
-              <TableHead>Session Type</TableHead>
-              <TableHead>Date & Time</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filterAppointments(upcomingAppointments).map((appointment) => {
-              const cancelDisabled = isCancelDisabled(appointment.dateTime);
-              return (
-                <TableRow key={appointment.id}>
-                  <TableCell>
-                    <button
-                      className="text-blue-600 hover:underline"
-                      onClick={() => {
-                        setSelectedPatient(appointment.patient);
-                        setShowHistoryModal(true);
-                      }}
-                    >
-                      {appointment.patient}
-                    </button>
-                  </TableCell>
-                  <TableCell>{appointment.type}</TableCell>
-                  <TableCell>{appointment.sessionType}</TableCell>
-                  <TableCell>
-                    {new Date(appointment.dateTime).toLocaleString()}
-                  </TableCell>
-                  <TableCell className="flex gap-2">
-                    <Button variant="outline">Reschedule</Button>
-                    {cancelDisabled ? (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Button variant="destructive" disabled>
+        <div className="flex font-medium mb-4">
+          <button
+            className={`px-4 py-2 text-md font-medium focus:outline-none ${
+              activeTab === "upcoming"
+                ? "border-b-2 border-blue-500 text-blue-600"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("upcoming")}
+          >
+            Upcoming
+          </button>
+          <button
+            className={`px-4 py-2 text-md font-medium focus:outline-none ${
+              activeTab === "past"
+                ? "border-b-2 border-blue-500 text-blue-600"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("past")}
+          >
+            Past
+          </button>
+        </div>
+
+        {/* Appointment Table (Switches Based on Active Tab) */}
+        <div className="bg-white rounded-lg p-4">
+          {activeTab === "upcoming" ? (
+            <Table className="mb-6">
+              <TableHeader>
+                <TableRow className="bg-gray-100">
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Patient Name</TableHead>
+                  <TableHead>Appointment Type</TableHead>
+                  <TableHead>Session Type</TableHead>
+
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filterAppointments(upcomingAppointments).map((appointment) => {
+                  const cancelDisabled = isCancelDisabled(appointment.dateTime);
+                  const appointmentDate = new Date(appointment.dateTime);
+                  const startTime = format(appointmentDate, "H:mm");
+                  const endTime = format(
+                    new Date(appointmentDate.getTime() + 30 * 60000),
+                    "H:mm"
+                  );
+
+                  let displayDate;
+                  if (isToday(appointmentDate)) {
+                    displayDate = `Today ${startTime} - ${endTime}`;
+                  } else if (isTomorrow(appointmentDate)) {
+                    displayDate = `Tomorrow ${startTime} - ${endTime}`;
+                  } else {
+                    displayDate = `${format(
+                      appointmentDate,
+                      "d MMM"
+                    )} ${startTime} - ${endTime}`;
+                  }
+                  return (
+                    <TableRow key={appointment.id}>
+                      <TableCell>{displayDate}</TableCell>
+                      <TableCell>
+                        <button
+                          className="text-blue-600 hover:underline"
+                          onClick={() => {
+                            setSelectedPatient(appointment.patient);
+                            setShowHistoryModal(true);
+                          }}
+                        >
+                          {appointment.patient}
+                        </button>
+                      </TableCell>
+                      <TableCell>{appointment.type}</TableCell>
+                      <TableCell>{appointment.sessionType}</TableCell>
+
+                      <TableCell className="flex gap-2">
+                        <Button variant="outline">Reschedule</Button>
+                        {cancelDisabled ? (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button variant="destructive" disabled>
+                                Cancel
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Cannot cancel within 2 hours of appointment
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <Button
+                            variant="destructive"
+                            onClick={() => handleCancelClick(appointment)}
+                          >
                             Cancel
                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          Cannot cancel within 2 hours of appointment
-                        </TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleCancelClick(appointment)}
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                  </TableCell>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-100">
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Patient Name</TableHead>
+                  <TableHead>Appointment Type</TableHead>
+                  <TableHead>Session Type</TableHead>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {filterAppointments(pastAppointments).map((appointment) => {
+                  const appointmentDate = new Date(appointment.dateTime);
+                  const startTime = format(appointmentDate, "H:mm");
+                  const endTime = format(
+                    new Date(appointmentDate.getTime() + 30 * 60000),
+                    "H:mm"
+                  );
 
-        {/* Past Appointments Table */}
-        <h3 className="text-lg font-semibold mb-2">Past Appointments</h3>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-100">
-              <TableHead>Patient Name</TableHead>
-              <TableHead>Appointment Type</TableHead>
-              <TableHead>Session Type</TableHead>
-              <TableHead>Date & Time</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filterAppointments(pastAppointments).map((appointment) => (
-              <TableRow key={appointment.id}>
-                <TableCell>
-                  <button
-                    className="text-blue-600 hover:underline"
-                    onClick={() => {
-                      setSelectedPatient(appointment.patient);
-                      setShowHistoryModal(true);
-                    }}
-                  >
-                    {appointment.patient}
-                  </button>
-                </TableCell>
-                <TableCell>{appointment.type}</TableCell>
-                <TableCell>{appointment.sessionType}</TableCell>
-                <TableCell>
-                  {new Date(appointment.dateTime).toLocaleString()}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                  let displayDate;
+                  if (isToday(appointmentDate)) {
+                    displayDate = `Today ${startTime} - ${endTime}`;
+                  } else if (isTomorrow(appointmentDate)) {
+                    displayDate = `Tomorrow ${startTime} - ${endTime}`;
+                  } else {
+                    displayDate = `${format(
+                      appointmentDate,
+                      "d MMM"
+                    )} ${startTime} - ${endTime}`;
+                  }
+
+                  return (
+                    <TableRow key={appointment.id}>
+                      <TableCell>{displayDate}</TableCell>
+                      <TableCell>
+                        <button
+                          className="text-blue-600 hover:underline"
+                          onClick={() => {
+                            setSelectedPatient(appointment.patient);
+                            setShowHistoryModal(true);
+                          }}
+                        >
+                          {appointment.patient}
+                        </button>
+                      </TableCell>
+                      <TableCell>{appointment.type}</TableCell>
+                      <TableCell>{appointment.sessionType}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </div>
 
         {/* Cancel Confirmation Modal */}
         <Dialog open={showCancelModal} onOpenChange={handleCloseModal}>
@@ -272,19 +336,16 @@ export default function Appointments() {
         </Dialog>
 
         {/* Patient History Modal */}
-        <Dialog open={showHistoryModal} onOpenChange={setShowHistoryModal}>
-          <DialogContent>
-            {selectedPatient && (
-              <PatientHistoryModal
-                isOpen={showHistoryModal}
-                onClose={() => setShowHistoryModal(false)}
-                patientName={selectedPatient}
-                upcomingAppointments={filteredUpcoming}
-                pastAppointments={filteredPast}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
+
+        {selectedPatient && (
+          <PatientHistoryModal
+            isOpen={showHistoryModal}
+            onClose={() => setShowHistoryModal(false)}
+            patientName={selectedPatient}
+            upcomingAppointments={filteredUpcoming}
+            pastAppointments={filteredPast}
+          />
+        )}
       </div>
     </TooltipProvider>
   );
