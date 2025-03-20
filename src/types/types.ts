@@ -1,3 +1,12 @@
+type TimeSlot = {
+  start: string; // "HH:MM" format
+  end: string; // "HH:MM" format
+};
+
+type WeeklyAvailability = Record<string, { slots: TimeSlot[] } | null>;
+
+type DateOverrideAvailability = Record<string, { slots: TimeSlot[] }>;
+
 export interface FormDataType {
   // ✅ Basic Info
   name: string;
@@ -7,7 +16,11 @@ export interface FormDataType {
   email: string;
   country: string;
   city: string;
-  languages: string;
+  gender: string;
+  dob: string; // Store DOB as a string (YYYY-MM-DD format)
+  languages: string[];
+  clinicHospital: string;
+  videoConsultation: boolean;
   socialMedia: {
     linkedin: string;
     twitter: string;
@@ -17,19 +30,17 @@ export interface FormDataType {
 
   // ✅ Specialization & Experience
   yearsOfPractice: number;
-  clinicHospital: string;
+  fieldOfPractice: string;
   certifications: { name: string; url: string }[]; // Stores file name + preview URL
   expertise: string[];
 
   // ✅ Pricing & Availability
   consultationFee: number;
   discount: number;
-  sessionDuration: 15 | 30 | 45 | 60; // Fixed session durations
-  workingHours: {
-    startTime: string; // "HH:MM" format
-    endTime: string; // "HH:MM" format
-  };
-  blackoutDates: string[]; // Array of dates in "YYYY-MM-DD" format
+  freeIntroCall: boolean;
+  sessionDuration: number;
+  availability: WeeklyAvailability; // Weekly availability (days of the week)
+  overrideAvailability: DateOverrideAvailability; // Date-specific overrides
   timeZone: string;
 
   // ✅ Payment & Subscription
@@ -38,7 +49,7 @@ export interface FormDataType {
     bankName: string;
     ifscCode: string;
   };
-  payoutFrequency: "weekly" | "bi-weekly" | "monthly";
-  paymentMode: "bank transfer" | "paypal" | "stripe";
+  payoutFrequency: string;
+  paymentMode: string;
   subscriptionOption: "commission" | "free access";
 }

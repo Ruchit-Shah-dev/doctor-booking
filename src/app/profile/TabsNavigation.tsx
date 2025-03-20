@@ -13,7 +13,7 @@ export default function TabsNavigation({
     { id: "Basic Info", label: "Basic Info" },
     { id: "Experience", label: "Experience" },
     { id: "Pricing & Availability", label: "Pricing & Availability" },
-    { id: "Payment & Subscription", label: "Payment & Subscription" },
+    { id: "Payment Info", label: "Payment Info" },
   ];
 
   return (

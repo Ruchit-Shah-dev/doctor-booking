@@ -116,6 +116,19 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+.input-field {
+  @apply mt-1 w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+/* body div:nth-child(4) {
+  max-width: unset;
+} */
+[role="dialog"] {
+  width: 80vw; /* Example: Increase Dialog width */
+  max-width: 800px;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;

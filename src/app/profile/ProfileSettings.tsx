@@ -9,6 +9,16 @@ import PricingAvailability from "@/app/profile/tabs/PricingAndAvailabilityTab";
 import PaymentSubscription from "@/app/profile/tabs/PaymentTab";
 import { FormDataType } from "@/types/types";
 
+const daysOfWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
 const ProfileSettings = () => {
   // State for storing form data
   const [formData, setFormData] = useState<FormDataType>({
@@ -20,7 +30,11 @@ const ProfileSettings = () => {
     email: "",
     country: "",
     city: "",
-    languages: "",
+    gender: "",
+    dob: "",
+    languages: [],
+    clinicHospital: "",
+    videoConsultation: false,
     socialMedia: {
       linkedin: "",
       twitter: "",
@@ -30,20 +44,24 @@ const ProfileSettings = () => {
 
     // ✅ Specialization & Experience
     yearsOfPractice: 0,
-    clinicHospital: "",
+    fieldOfPractice: "",
     certifications: [],
     expertise: [],
 
     // ✅ Pricing & Availability
     consultationFee: 0,
     discount: 0,
+    freeIntroCall: false,
     sessionDuration: 30, // Default: 30 min
-    workingHours: {
-      startTime: "09:00",
-      endTime: "17:00",
-    },
-    blackoutDates: [], // Array of dates where doctor is unavailable
-    timeZone: "",
+    availability: daysOfWeek.reduce((acc, day, index) => {
+      acc[day] =
+        index > 0 && index < 6
+          ? { slots: [{ start: "09:00", end: "10:00" }] }
+          : null;
+      return acc;
+    }, {} as Record<string, { slots: { start: string; end: string }[] } | null>),
+    overrideAvailability: {}, // Store date-specific overrides
+    timeZone: "Asia/Kolkata",
 
     // ✅ Payment & Subscription
     bankDetails: {
@@ -57,7 +75,23 @@ const ProfileSettings = () => {
   });
 
   // State for managing active tab
+  const tabs = [
+    "Basic Info",
+    "Experience",
+    "Pricing & Availability",
+    "Payment Info",
+  ];
   const [activeTab, setActiveTab] = useState("Basic Info");
+
+  // Function to move to the next tab
+  // const handleNextTab = () => {
+  //   const currentIndex = tabs.indexOf(activeTab);
+  //   if (currentIndex < tabs.length - 1) {
+  //     setActiveTab(tabs[currentIndex + 1]); // Move to the next tab
+  //   } else {
+  //     alert("Profile Saved Successfully!"); // Final save action
+  //   }
+  // };
 
   return (
     <div className="flex">
@@ -88,12 +122,21 @@ const ProfileSettings = () => {
               setFormData={setFormData}
             />
           )}
-          {activeTab === "Payment & Subscription" && (
+          {activeTab === "Payment Info" && (
             <PaymentSubscription
               formData={formData}
               setFormData={setFormData}
             />
           )}
+        </div>
+        {/* Save Button */}
+        <div className="mt-6 flex justify-end mr-40">
+          <button
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200"
+            onClick={() => alert("Profile Saved Successfully!")} // Placeholder function
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
